@@ -260,7 +260,6 @@ RM.forEach(r=>{
   const d=document.createElement('div');d.className='base-room';
   d.innerHTML=`<div class="base-room-header"><span class="room-dot" style="background:${r.color}"></span><span class="room-name">${r.name} <span class="en">· ${r.en}</span></span><div class="season-pills" id="pills-${r.id}"></div></div><div class="sl-row"><input type="range" id="${r.id}" min="${r.range[0]}" max="${r.range[1]}" step="${r.range[2]}" value="${r.base}" style="flex:1"><span class="sl-out"><span id="${r.id}-o">${r.base}</span> ฿</span></div>`;
   br.appendChild(d);
-  document.getElementById(r.id).addEventListener('input',()=>{document.getElementById(r.id+'-o').textContent=document.getElementById(r.id).value;calc();});
 });
 
 // Build editable season grid
@@ -272,7 +271,6 @@ MN.forEach((m,i)=>{
   const c=document.createElement('div');c.className='smc';
   c.innerHTML=`<div class="smc-top"><div><span class="smc-m">${m}</span><span class="smc-me">${ME[i]}</span></div><span class="badge ${bcl}">${btKo} ${btEn}</span></div><div class="smc-fr"><span class="smc-fl">factor</span><input type="range" id="fc-${i}" min="0.5" max="2.0" step="0.05" value="${FC0[i]}"><span class="smc-fo" id="fc-${i}-o">${FC0[i].toFixed(2)}</span></div>`;
   sgEl.appendChild(c);
-  document.getElementById(`fc-${i}`).addEventListener('input',()=>{document.getElementById(`fc-${i}-o`).textContent=parseFloat(document.getElementById(`fc-${i}`).value).toFixed(2);calc();});
 });
 
 function getFC(){return MN.map((_,i)=>parseFloat(document.getElementById(`fc-${i}`).value)||FC0[i]);}
@@ -358,13 +356,89 @@ function calc(){
   else{ci=new Chart(document.getElementById('chart'),{type:'bar',data:{labels:ME,datasets:ds},options:{responsive:true,maintainAspectRatio:false,animation:{duration:200},plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>' ฿'+ctx.parsed.y.toLocaleString()}}},scales:{x:{stacked:true,ticks:{autoSkip:false,maxRotation:0,font:{size:10}},grid:{display:false},border:{display:false}},y:{stacked:true,ticks:{callback:v=>'฿'+fK(v),font:{size:10}},grid:{color:'rgba(0,0,0,0.05)'},border:{display:false}}}}});}
 }
 
-['oh','om','ol','ota'].forEach(id=>{document.getElementById(id).addEventListener('input',()=>{document.getElementById(id+'-o').textContent=document.getElementById(id).value+'%';calc();});});
-CI.forEach(id=>document.getElementById(id).addEventListener('input',calc));
-document.getElementById('fx').addEventListener('input',calc);
+// ── localStorage 저장/복원 ──
+const LS_KEY='ch-sim-v1';
+
+function saveState(){
+  const state={};
+  // 점유율·채널·환율 슬라이더
+  ['oh','om','ol','ota','fx'].forEach(id=>{state[id]=document.getElementById(id).value;});
+  // 베이스 가격 슬라이더
+  RM.forEach(r=>{state[r.id]=document.getElementById(r.id).value;});
+  // 월별 팩터 슬라이더
+  MN.forEach((_,i)=>{state[`fc-${i}`]=document.getElementById(`fc-${i}`).value;});
+  // 고정비 숫자 입력
+  CI.forEach(id=>{state[id]=document.getElementById(id).value;});
+  try{localStorage.setItem(LS_KEY,JSON.stringify(state));}catch(e){}
+}
+
+function loadState(){
+  try{
+    const raw=localStorage.getItem(LS_KEY);
+    if(!raw)return;
+    const state=JSON.parse(raw);
+    // 슬라이더 복원
+    ['oh','om','ol','ota','fx'].forEach(id=>{
+      if(state[id]!=null){
+        document.getElementById(id).value=state[id];
+        const out=document.getElementById(id+'-o');
+        if(out)out.textContent=state[id]+(id==='fx'?'':' %'.replace(' ',''));
+      }
+    });
+    // 점유율 슬라이더 라벨 별도 처리 (% 붙임)
+    ['oh','om','ol','ota'].forEach(id=>{
+      const out=document.getElementById(id+'-o');
+      if(out&&state[id]!=null)out.textContent=state[id]+'%';
+    });
+    // 환율 라벨
+    if(state['fx']!=null)document.getElementById('fx-v').textContent=parseFloat(state['fx']).toFixed(2);
+    // 베이스 가격
+    RM.forEach(r=>{
+      if(state[r.id]!=null){
+        document.getElementById(r.id).value=state[r.id];
+        document.getElementById(r.id+'-o').textContent=state[r.id];
+      }
+    });
+    // 월별 팩터
+    MN.forEach((_,i)=>{
+      const id=`fc-${i}`;
+      if(state[id]!=null){
+        document.getElementById(id).value=state[id];
+        document.getElementById(id+'-o').textContent=parseFloat(state[id]).toFixed(2);
+      }
+    });
+    // 고정비
+    CI.forEach(id=>{if(state[id]!=null)document.getElementById(id).value=state[id];});
+  }catch(e){}
+}
+
+// 이벤트 리스너에 저장 추가
+['oh','om','ol','ota'].forEach(id=>{
+  document.getElementById(id).addEventListener('input',()=>{
+    document.getElementById(id+'-o').textContent=document.getElementById(id).value+'%';
+    calc();saveState();
+  });
+});
+CI.forEach(id=>document.getElementById(id).addEventListener('input',()=>{calc();saveState();}));
+document.getElementById('fx').addEventListener('input',()=>{calc();saveState();});
+RM.forEach(r=>{
+  document.getElementById(r.id).addEventListener('input',()=>{
+    document.getElementById(r.id+'-o').textContent=document.getElementById(r.id).value;
+    calc();saveState();
+  });
+});
+MN.forEach((_,i)=>{
+  document.getElementById(`fc-${i}`).addEventListener('input',()=>{
+    document.getElementById(`fc-${i}-o`).textContent=parseFloat(document.getElementById(`fc-${i}`).value).toFixed(2);
+    calc();saveState();
+  });
+});
 
 const pages=document.querySelectorAll('.page'),tabs=document.querySelectorAll('.nav-tab');
 function switchTab(i){pages.forEach((p,j)=>p.classList.toggle('active',i===j));tabs.forEach((t,j)=>t.classList.toggle('active',i===j));}
 if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js').catch(()=>{});
+
+loadState();
 calc();
 </script>
 </body>
