@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#7A9E6B">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Cozyheim">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<title>Cozyheim Revenue Simulator</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --sage: #7A9E6B;
+  --sage-dark: #5C7E4E;
+  --sage-light: #93B584;
+  --sage-bg: #EEF4EB;
+  --wood: #8B5A3C;
+  --cream: #F5F0E8;
+  --cream-dark: #EDE8E0;
+  --text: #1C1C1A;
+  --text-2: #5A5A56;
+  --text-3: #9A9A94;
+  --border: rgba(0,0,0,0.08);
+  --border-med: rgba(0,0,0,0.13);
+  --red: #C0392B;
+  --red-bg: #FDF0EE;
+  --green: #2D6A4F;
+  --green-bg: #EEF6F1;
+  --radius: 12px;
+  --radius-sm: 8px;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+html, body { height: 100%; }
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--cream);
+  color: var(--text);
+  font-size: 14px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── NAV ── */
+.nav {
+  position: sticky; top: 0; z-index: 100;
+  background: var(--sage);
+  padding: env(safe-area-inset-top, 0) 0 0;
+}
+.nav-inner {
+  display: flex; align-items: center; gap: 10px;
+  padding: 12px 16px;
+}
+.nav-logo {
+  width: 28px; height: 28px; border-radius: 8px;
+  background: rgba(255,255,255,0.25);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px; font-weight: 600; color: #fff; letter-spacing: -0.5px;
+}
+.nav-title { font-size: 15px; font-weight: 500; color: #fff; flex: 1; }
+.nav-sub { font-size: 11px; color: rgba(255,255,255,0.7); }
+.nav-tabs {
+  display: flex; border-top: 1px solid rgba(255,255,255,0.15);
+  overflow-x: auto; scrollbar-width: none;
+}
+.nav-tabs::-webkit-scrollbar { display: none; }
+.nav-tab {
+  flex: 1; min-width: 72px; padding: 9px 4px;
+  text-align: center; font-size: 11px; font-weight: 500;
+  color: rgba(255,255,255,0.65); cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: color .15s, border-color .15s;
+  white-space: nowrap;
+}
+.nav-tab.active { color: #fff; border-bottom-color: rgba(255,255,255,0.9); }
+
+/* ── PAGES ── */
+.page { display: none; padding: 16px 16px calc(env(safe-area-inset-bottom,0px) + 24px); }
+.page.active { display: block; }
+
+/* ── SUMMARY CARDS ── */
+.cards-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 14px; }
+.kpi {
+  background: #fff; border-radius: var(--radius); padding: 12px 14px;
+  border: 1px solid var(--border);
+}
+.kpi.accent { background: var(--sage-bg); border-color: var(--sage-light); }
+.kpi.profit { background: var(--green-bg); border-color: #A8D5B5; }
+.kpi.loss { background: var(--red-bg); border-color: #F0B8B2; }
+.kpi-label { font-size: 10px; color: var(--text-3); font-weight: 500; text-transform: uppercase; letter-spacing: .05em; margin-bottom: 5px; }
+.kpi-thb { font-size: 20px; font-weight: 600; color: var(--text); font-family: 'DM Mono', monospace; line-height: 1.2; }
+.kpi-thb.profit-val { color: var(--green); }
+.kpi-thb.loss-val { color: var(--red); }
+.kpi-krw { font-size: 12px; color: var(--text-3); font-family: 'DM Mono', monospace; margin-top: 2px; }
+.kpi-krw.profit-val { color: #52a874; }
+.kpi-krw.loss-val { color: #e07068; }
+.kpi-sub { font-size: 10px; color: var(--text-3); margin-top: 3px; }
+
+/* ── SECTION ── */
+.section { background: #fff; border-radius: var(--radius); border: 1px solid var(--border); padding: 14px 14px; margin-bottom: 10px; }
+.sec-title { font-size: 10px; font-weight: 600; color: var(--text-3); text-transform: uppercase; letter-spacing: .07em; margin-bottom: 12px; }
+
+/* ── SLIDERS ── */
+.sl-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+.sl-label { font-size: 12px; color: var(--text-2); min-width: 82px; flex-shrink: 0; display: flex; align-items: center; gap: 5px; }
+.sl-row input[type=range] {
+  flex: 1; -webkit-appearance: none; height: 4px;
+  background: var(--cream-dark); border-radius: 2px; outline: none;
+}
+.sl-row input[type=range]::-webkit-slider-thumb {
+  -webkit-appearance: none; width: 20px; height: 20px; border-radius: 50%;
+  background: var(--sage); border: 2px solid #fff;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.2); cursor: pointer;
+}
+.sl-out { font-size: 13px; font-weight: 600; min-width: 44px; text-align: right; font-family: 'DM Mono', monospace; color: var(--text); }
+.divider { border: none; border-top: 1px solid var(--border); margin: 10px 0; }
+
+/* ── BASE PRICE GRID ── */
+.base-room { margin-bottom: 12px; }
+.base-room-header { display: flex; align-items: center; gap: 6px; margin-bottom: 6px; }
+.room-dot { width: 8px; height: 8px; border-radius: 2px; flex-shrink: 0; }
+.room-name { font-size: 12px; font-weight: 500; color: var(--text); }
+.season-pills { display: flex; gap: 4px; margin-left: auto; flex-wrap: wrap; justify-content: flex-end; }
+.season-pill { font-size: 10px; font-family: 'DM Mono', monospace; padding: 2px 6px; border-radius: 4px; background: var(--cream-dark); color: var(--text-2); }
+
+/* ── COST INPUTS ── */
+.cost-row { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+.cost-label { font-size: 12px; color: var(--text-2); flex: 1; }
+.cost-input-wrap { display: flex; align-items: center; gap: 4px; }
+.cost-input-wrap input {
+  width: 100px; height: 34px; padding: 0 8px;
+  font-size: 13px; font-family: 'DM Mono', monospace;
+  border: 1px solid var(--border-med); border-radius: var(--radius-sm);
+  background: var(--cream); color: var(--text); outline: none;
+  text-align: right;
+}
+.cost-input-wrap input:focus { border-color: var(--sage); }
+.cost-unit { font-size: 11px; color: var(--text-3); }
+.cost-total-row {
+  display: flex; justify-content: space-between; align-items: center;
+  padding-top: 10px; border-top: 1px solid var(--border); margin-top: 4px;
+}
+.cost-total-label { font-size: 12px; font-weight: 500; color: var(--text-2); }
+.cost-total-val { text-align: right; }
+.cost-total-thb { font-size: 15px; font-weight: 600; font-family: 'DM Mono', monospace; color: var(--text); }
+.cost-total-krw { font-size: 11px; color: var(--text-3); font-family: 'DM Mono', monospace; }
+
+/* ── FX BAR ── */
+.fx-row {
+  background: var(--sage-bg); border-radius: var(--radius-sm);
+  padding: 8px 12px; display: flex; align-items: center; gap: 10px; margin-bottom: 14px;
+}
+.fx-label { font-size: 11px; color: var(--sage-dark); font-weight: 500; }
+.fx-val { font-size: 13px; font-weight: 600; color: var(--sage-dark); font-family: 'DM Mono', monospace; }
+.fx-row input[type=range] { flex: 1; -webkit-appearance: none; height: 3px; background: var(--sage-light); border-radius: 2px; outline: none; }
+.fx-row input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 18px; height: 18px; border-radius: 50%; background: var(--sage-dark); border: 2px solid #fff; box-shadow: 0 1px 3px rgba(0,0,0,0.2); cursor: pointer; }
+.fx-date { font-size: 10px; color: var(--sage-dark); opacity: .7; }
+
+/* ── TABLE ── */
+.table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; margin: 0 -14px; padding: 0 14px; }
+table { width: 100%; border-collapse: collapse; font-size: 12px; }
+th { font-size: 10px; font-weight: 600; color: var(--text-3); text-transform: uppercase; letter-spacing: .04em; padding: 6px 6px 8px; border-bottom: 1px solid var(--border-med); text-align: right; white-space: nowrap; }
+th:first-child { text-align: left; }
+td { padding: 6px 6px; text-align: right; border-bottom: 1px solid var(--border); vertical-align: middle; }
+td:first-child { text-align: left; }
+.td-main { font-size: 12px; font-family: 'DM Mono', monospace; color: var(--text); }
+.td-sub { font-size: 10px; color: var(--text-3); font-family: 'DM Mono', monospace; }
+tr.foot-row td { font-weight: 600; background: var(--cream); border-top: 1.5px solid var(--border-med); border-bottom: none; }
+.profit-cell { color: var(--green); }
+.loss-cell { color: var(--red); }
+
+/* ── BADGES ── */
+.badge { display: inline-block; font-size: 9px; font-weight: 600; padding: 2px 6px; border-radius: 4px; letter-spacing: .03em; }
+.bh { background: #DEF0D8; color: #3A6B2A; }
+.bm { background: #FAEEDA; color: #7A4F0B; }
+.bl { background: #DAEAF8; color: #1A5A8A; }
+
+/* ── CHART ── */
+.chart-legends { display: flex; flex-wrap: wrap; gap: 8px 14px; margin-bottom: 10px; }
+.chart-legend { display: flex; align-items: center; gap: 5px; font-size: 11px; color: var(--text-2); }
+.legend-dot { width: 8px; height: 8px; border-radius: 2px; }
+.chart-wrap { position: relative; width: 100%; height: 200px; }
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-inner">
+    <div class="nav-logo">CH</div>
+    <div>
+      <div class="nav-title">Cozyheim Revenue Simulator</div>
+      <div class="nav-sub">Bangkok Yaowarat Hostel</div>
+    </div>
+  </div>
+  <div class="nav-tabs">
+    <div class="nav-tab active" onclick="switchTab(0)">요약</div>
+    <div class="nav-tab" onclick="switchTab(1)">베이스 가격</div>
+    <div class="nav-tab" onclick="switchTab(2)">고정비</div>
+    <div class="nav-tab" onclick="switchTab(3)">점유율</div>
+    <div class="nav-tab" onclick="switchTab(4)">월별 내역</div>
+  </div>
+</nav>
+
+<!-- PAGE 0: 요약 -->
+<div class="page active" id="page-0">
+  <div class="fx-row">
+    <span class="fx-label">환율</span>
+    <span class="fx-val">1 THB = <span id="fx-v">46.29</span>원</span>
+    <input type="range" id="fx" min="38" max="54" step="0.1" value="46.3">
+    <span class="fx-date">2026.04.04</span>
+  </div>
+  <div class="cards-grid">
+    <div class="kpi accent">
+      <div class="kpi-label">연간 총 매출</div>
+      <div class="kpi-thb" id="s-grand-thb">—</div>
+      <div class="kpi-krw" id="s-grand-krw">—</div>
+      <div class="kpi-sub">OTA 수수료 전</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-label">OTA 공제 후</div>
+      <div class="kpi-thb" id="s-net-thb">—</div>
+      <div class="kpi-krw" id="s-net-krw">—</div>
+      <div class="kpi-sub" id="s-ota-sub">OTA —%</div>
+    </div>
+    <div class="kpi" id="profit-kpi">
+      <div class="kpi-label">연간 순수익</div>
+      <div class="kpi-thb" id="s-profit-thb">—</div>
+      <div class="kpi-krw" id="s-profit-krw">—</div>
+      <div class="kpi-sub" id="s-margin">순이익률 —%</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-label">월평균 순수익</div>
+      <div class="kpi-thb" id="s-mprofit-thb">—</div>
+      <div class="kpi-krw" id="s-mprofit-krw">—</div>
+      <div class="kpi-sub" id="s-occ-sub">점유율 —%</div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="sec-title">월별 수익</div>
+    <div class="chart-legends">
+      <span class="chart-legend"><span class="legend-dot" style="background:#7A9E6B"></span>도미(8인)</span>
+      <span class="chart-legend"><span class="legend-dot" style="background:#AFA9EC"></span>도미(6인 여)</span>
+      <span class="chart-legend"><span class="legend-dot" style="background:#EF9F27"></span>싱글룸</span>
+      <span class="chart-legend"><span class="legend-dot" style="background:#D85A30"></span>더블룸</span>
+      <span class="chart-legend"><span class="legend-dot" style="background:rgba(192,57,43,0.4)"></span>고정비</span>
+    </div>
+    <div class="chart-wrap"><canvas id="chart"></canvas></div>
+  </div>
+</div>
+
+<!-- PAGE 1: 베이스 가격 -->
+<div class="page" id="page-1">
+  <div class="section">
+    <div class="sec-title">객실별 베이스 가격</div>
+    <div id="base-rooms"></div>
+  </div>
+  <div class="section">
+    <div class="sec-title">시즌별 적용 요금 미리보기</div>
+    <div id="rate-preview"></div>
+  </div>
+</div>
+
+<!-- PAGE 2: 고정비 -->
+<div class="page" id="page-2">
+  <div class="section">
+    <div class="sec-title">월 고정비</div>
+    <div class="cost-row"><span class="cost-label">임차료</span><div class="cost-input-wrap"><input type="number" id="c-rent" value="45000" min="0" step="1000"><span class="cost-unit">THB</span></div></div>
+    <div class="cost-row"><span class="cost-label">인건비</span><div class="cost-input-wrap"><input type="number" id="c-staff" value="30000" min="0" step="1000"><span class="cost-unit">THB</span></div></div>
+    <div class="cost-row"><span class="cost-label">공과금·수도·전기</span><div class="cost-input-wrap"><input type="number" id="c-util" value="8000" min="0" step="500"><span class="cost-unit">THB</span></div></div>
+    <div class="cost-row"><span class="cost-label">소모품·청소</span><div class="cost-input-wrap"><input type="number" id="c-supply" value="5000" min="0" step="500"><span class="cost-unit">THB</span></div></div>
+    <div class="cost-row"><span class="cost-label">OTA 마케팅</span><div class="cost-input-wrap"><input type="number" id="c-mkt" value="3000" min="0" step="500"><span class="cost-unit">THB</span></div></div>
+    <div class="cost-row"><span class="cost-label">기타</span><div class="cost-input-wrap"><input type="number" id="c-other" value="4000" min="0" step="500"><span class="cost-unit">THB</span></div></div>
+    <div class="cost-total-row">
+      <span class="cost-total-label">월 합계</span>
+      <div class="cost-total-val">
+        <div class="cost-total-thb" id="cost-thb-total">—</div>
+        <div class="cost-total-krw" id="cost-krw-total">—</div>
+      </div>
+    </div>
+  </div>
+  <div class="section">
+    <div class="sec-title">연간 고정비</div>
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:4px 0">
+      <span style="font-size:13px;color:var(--text-2)">총 고정비</span>
+      <div style="text-align:right">
+        <div style="font-size:15px;font-weight:600;font-family:'DM Mono',monospace" id="cost-ay-thb">—</div>
+        <div style="font-size:11px;color:var(--text-3);font-family:'DM Mono',monospace" id="cost-ay-krw">—</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE 3: 점유율 -->
+<div class="page" id="page-3">
+  <div class="section">
+    <div class="sec-title">점유율 설정</div>
+    <div class="sl-row">
+      <span class="sl-label"><span class="badge bh">성수기</span></span>
+      <input type="range" id="oh" min="50" max="100" step="1" value="90">
+      <span class="sl-out" id="oh-o">90%</span>
+    </div>
+    <div class="sl-row">
+      <span class="sl-label"><span class="badge bm">중간</span></span>
+      <input type="range" id="om" min="30" max="100" step="1" value="80">
+      <span class="sl-out" id="om-o">80%</span>
+    </div>
+    <div class="sl-row">
+      <span class="sl-label"><span class="badge bl">비수기</span></span>
+      <input type="range" id="ol" min="10" max="100" step="1" value="60">
+      <span class="sl-out" id="ol-o">60%</span>
+    </div>
+  </div>
+  <div class="section">
+    <div class="sec-title">채널 믹스</div>
+    <div class="sl-row">
+      <span class="sl-label" style="min-width:82px;font-size:12px">OTA 비중</span>
+      <input type="range" id="ota" min="0" max="100" step="5" value="70">
+      <span class="sl-out" id="ota-o">70%</span>
+    </div>
+    <div style="font-size:11px;color:var(--text-3);margin-top:-2px">OTA 수수료 20% 적용 · 직접예약 수수료 없음</div>
+  </div>
+  <div class="section">
+    <div class="sec-title">월별 시즌 구분</div>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px" id="season-grid"></div>
+  </div>
+</div>
+
+<!-- PAGE 4: 월별 내역 -->
+<div class="page" id="page-4">
+  <div class="section" style="padding:14px 0">
+    <div style="padding:0 14px 10px" class="sec-title">월별 상세</div>
+    <div class="table-wrap">
+    <table>
+      <thead><tr>
+        <th style="text-align:left">월</th>
+        <th>시즌</th>
+        <th>팩터</th>
+        <th>도미8</th>
+        <th>도미6</th>
+        <th>싱글</th>
+        <th>더블</th>
+        <th>고정비</th>
+        <th>순수익</th>
+      </tr></thead>
+      <tbody id="tbody"></tbody>
+      <tfoot>
+        <tr class="foot-row">
+          <td colspan="3" style="text-align:left;font-size:11px">연간</td>
+          <td id="ft0"><span class="td-main">—</span></td>
+          <td id="ft1"><span class="td-main">—</span></td>
+          <td id="ft2"><span class="td-main">—</span></td>
+          <td id="ft3"><span class="td-main">—</span></td>
+          <td id="ft-fix"><span class="td-main">—</span></td>
+          <td id="ft-all"><span class="td-main">—</span></td>
+        </tr>
+      </tfoot>
+    </table>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+const MN=['1월','2월','3월','4월','5월','6월','7월','8월','9월','10월','11월','12월'];
+const MNS=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+const DY=[31,28,31,30,31,30,31,31,30,31,30,31];
+const FC=[1.15,1.15,1.0,1.2,1.0,1.0,0.9,0.85,0.85,1.1,1.15,1.2];
+const SS=['h','h','m','h','m','m','l','l','l','m','h','h'];
+const RM=[
+  {id:'b-d8',beds:8,base:400,max:1000,color:'#7A9E6B',name:'도미(8인)',range:[200,700,10]},
+  {id:'b-d6',beds:6,base:320,max:1000,color:'#AFA9EC',name:'도미(6인 여)',range:[200,700,10]},
+  {id:'b-sn',beds:1,base:900,max:1400,color:'#EF9F27',name:'싱글룸',range:[500,1500,50]},
+  {id:'b-db',beds:1,base:1200,max:2200,color:'#D85A30',name:'더블룸',range:[700,2000,50]},
+];
+const COST_IDS=['c-rent','c-staff','c-util','c-supply','c-mkt','c-other'];
+const fK=v=>{const a=Math.abs(v);const s=v<0?'-':'';if(a>=1e6)return s+(a/1e6).toFixed(1)+'M';if(a>=1e3)return s+Math.round(a/1e3)+'K';return s+Math.round(a)+''};
+const fKW=v=>{const a=Math.abs(v);const s=v<0?'-':'';if(a>=1e8)return s+(a/1e8).toFixed(1)+'억';if(a>=1e4)return s+Math.round(a/1e4)+'만';return s+Math.round(a)+''};
+
+let chartInst=null;
+
+// Build base room sliders
+const baseRooms=document.getElementById('base-rooms');
+RM.forEach(r=>{
+  const div=document.createElement('div');
+  div.className='base-room';
+  div.innerHTML=`
+    <div class="base-room-header">
+      <span class="room-dot" style="background:${r.color}"></span>
+      <span class="room-name">${r.name}</span>
+      <div class="season-pills" id="pills-${r.id}"></div>
+    </div>
+    <div class="sl-row">
+      <input type="range" id="${r.id}" min="${r.range[0]}" max="${r.range[1]}" step="${r.range[2]}" value="${r.base}" style="flex:1">
+      <span class="sl-out"><span id="${r.id}-o">${r.base}</span> ฿</span>
+    </div>`;
+  baseRooms.appendChild(div);
+  document.getElementById(r.id).addEventListener('input',()=>{
+    document.getElementById(r.id+'-o').textContent=document.getElementById(r.id).value;
+    calc();
+  });
+});
+
+// Build season grid
+const sg=document.getElementById('season-grid');
+MN.forEach((m,i)=>{
+  const sc=SS[i];
+  const bcl=sc==='h'?'bh':sc==='m'?'bm':'bl';
+  const bt=sc==='h'?'성수기':sc==='m'?'중간':'비수기';
+  sg.innerHTML+=`<div style="text-align:center;padding:6px 4px;background:var(--cream);border-radius:6px"><div style="font-size:11px;font-weight:500;margin-bottom:3px">${m}</div><span class="badge ${bcl}">${bt}</span><div style="font-size:10px;color:var(--text-3);margin-top:2px">${FC[i].toFixed(2)}×</div></div>`;
+});
+
+function getBases(){return RM.map(r=>parseInt(document.getElementById(r.id).value)||0);}
+function getCost(){return COST_IDS.reduce((s,id)=>s+(parseFloat(document.getElementById(id).value)||0),0);}
+
+function calc(){
+  const bases=getBases();
+  const occ={h:parseInt(document.getElementById('oh').value)/100,m:parseInt(document.getElementById('om').value)/100,l:parseInt(document.getElementById('ol').value)/100};
+  const ota=parseInt(document.getElementById('ota').value)/100;
+  const fx=parseFloat(document.getElementById('fx').value);
+  const mCost=getCost();
+  const aCost=mCost*12;
+
+  document.getElementById('fx-v').textContent=fx.toFixed(2);
+  document.getElementById('cost-thb-total').textContent='฿'+fK(mCost);
+  document.getElementById('cost-krw-total').textContent='₩'+fKW(mCost*fx);
+  document.getElementById('cost-ay-thb').textContent='฿'+fK(aCost);
+  document.getElementById('cost-ay-krw').textContent='₩'+fKW(aCost*fx);
+
+  // Season pills update
+  const seasons=[{label:'비수기',f:Math.min(...FC)},{label:'중간',f:1.0},{label:'성수기',f:Math.max(...FC)}];
+  RM.forEach((r,i)=>{
+    const base=bases[i];
+    const pills=document.getElementById('pills-'+r.id);
+    if(pills) pills.innerHTML=seasons.map(s=>`<span class="season-pill">฿${Math.round(Math.min(base*s.f,r.max))}</span>`).join('');
+  });
+
+  // Rate preview
+  const rp=document.getElementById('rate-preview');
+  if(rp){
+    rp.innerHTML=RM.map((r,i)=>{
+      const base=bases[i];
+      const rows=seasons.map(s=>{
+        const rate=Math.min(base*s.f,r.max);
+        return `<div style="display:flex;justify-content:space-between;font-size:11px;padding:2px 0">
+          <span style="color:var(--text-3)">${s.label}</span>
+          <span style="font-family:'DM Mono',monospace">฿${Math.round(rate)} <span style="color:var(--text-3)">₩${fKW(rate*fx)}</span></span></div>`;
+      }).join('');
+      return `<div style="margin-bottom:10px;padding-bottom:10px;border-bottom:1px solid var(--border)">
+        <div style="display:flex;align-items:center;gap:5px;margin-bottom:5px">
+          <span style="display:inline-block;width:8px;height:8px;border-radius:2px;background:${r.color}"></span>
+          <span style="font-size:12px;font-weight:500">${r.name}</span>
+        </div>${rows}</div>`;
+    }).join('');
+  }
+
+  const monthly=MN.map((_,mi)=>{
+    const oc=occ[SS[mi]];
+    return RM.map((r,i)=>Math.min(bases[i]*FC[mi],r.max)*r.beds*oc*DY[mi]);
+  });
+
+  const col=[0,0,0,0];
+  const rowRev=monthly.map(r=>{let s=0;r.forEach((v,i)=>{col[i]+=v;s+=v;});return s;});
+  const grand=rowRev.reduce((a,b)=>a+b,0);
+  const netRev=grand*(1-ota*0.2);
+  const aProfit=netRev-aCost;
+  const margin=netRev>0?aProfit/netRev*100:0;
+  const avgOcc=(occ.h*6+occ.m*4+occ.l*3)/13;
+
+  // Summary cards
+  document.getElementById('s-grand-thb').textContent='฿'+fK(grand);
+  document.getElementById('s-grand-krw').textContent='₩'+fKW(grand*fx);
+  document.getElementById('s-net-thb').textContent='฿'+fK(netRev);
+  document.getElementById('s-net-krw').textContent='₩'+fKW(netRev*fx);
+  document.getElementById('s-ota-sub').textContent='OTA '+Math.round(ota*100)+'% · 수수료 20%';
+  document.getElementById('s-occ-sub').textContent='평균 점유율 '+Math.round(avgOcc*100)+'%';
+
+  const pk=document.getElementById('profit-kpi');
+  const pt=document.getElementById('s-profit-thb');
+  const pkrw=document.getElementById('s-profit-krw');
+  const mpt=document.getElementById('s-mprofit-thb');
+  const mpkrw=document.getElementById('s-mprofit-krw');
+  const sign=v=>v>=0?'':'-';
+  pk.className='kpi '+(aProfit>=0?'profit':'loss');
+  const vc=aProfit>=0?'profit-val':'loss-val';
+  pt.className='kpi-thb '+vc; pt.textContent=sign(aProfit)+'฿'+fK(Math.abs(aProfit));
+  pkrw.className='kpi-krw '+vc; pkrw.textContent=sign(aProfit)+'₩'+fKW(Math.abs(aProfit)*fx);
+  mpt.className='kpi-thb '+vc; mpt.textContent=sign(aProfit)+'฿'+fK(Math.abs(aProfit/12));
+  mpkrw.className='kpi-krw '+vc; mpkrw.textContent=sign(aProfit)+'₩'+fKW(Math.abs(aProfit/12)*fx);
+  document.getElementById('s-margin').textContent='순이익률 '+margin.toFixed(1)+'%';
+
+  // Table
+  const tbody=document.getElementById('tbody');
+  if(tbody){
+    tbody.innerHTML='';
+    monthly.forEach((r,mi)=>{
+      const rev=rowRev[mi]*(1-ota*0.2);
+      const profit=rev-mCost;
+      const sc=SS[mi];
+      const bcl=sc==='h'?'bh':sc==='m'?'bm':'bl';
+      const bt=sc==='h'?'성수기':sc==='m'?'중간':'비수기';
+      const pc=profit>=0?'profit-cell':'loss-cell';
+      const tr=document.createElement('tr');
+      tr.innerHTML=`<td><span class="td-main">${MN[mi]}</span></td>
+        <td><span class="badge ${bcl}">${bt}</span></td>
+        <td><span class="td-main">${FC[mi].toFixed(2)}</span></td>`+
+        r.map(v=>`<td><span class="td-main">฿${fK(v)}</span><span class="td-sub">₩${fKW(v*fx)}</span></td>`).join('')+
+        `<td><span class="td-main" style="color:var(--red)">-฿${fK(mCost)}</span><span class="td-sub" style="color:#e07068">-₩${fKW(mCost*fx)}</span></td>
+        <td><span class="td-main ${pc}">${sign(profit)}฿${fK(Math.abs(profit))}</span><span class="td-sub ${pc}">${sign(profit)}₩${fKW(Math.abs(profit)*fx)}</span></td>`;
+      tbody.appendChild(tr);
+    });
+    [0,1,2,3].forEach(i=>{ document.getElementById('ft'+i).innerHTML=`<span class="td-main">฿${fK(col[i])}</span><span class="td-sub">₩${fKW(col[i]*fx)}</span>`; });
+    document.getElementById('ft-fix').innerHTML=`<span class="td-main" style="color:var(--red)">-฿${fK(aCost)}</span><span class="td-sub" style="color:#e07068">-₩${fKW(aCost*fx)}</span>`;
+    const atc=aProfit>=0?'profit-cell':'loss-cell';
+    document.getElementById('ft-all').innerHTML=`<span class="td-main ${atc}">${sign(aProfit)}฿${fK(Math.abs(aProfit))}</span><span class="td-sub ${atc}">${sign(aProfit)}₩${fKW(Math.abs(aProfit)*fx)}</span>`;
+  }
+
+  // Chart
+  const ds=[
+    {label:'도미(8인)',backgroundColor:'#7A9E6B',data:monthly.map(r=>Math.round(r[0]))},
+    {label:'도미(6인)',backgroundColor:'#AFA9EC',data:monthly.map(r=>Math.round(r[1]))},
+    {label:'싱글룸',backgroundColor:'#EF9F27',data:monthly.map(r=>Math.round(r[2]))},
+    {label:'더블룸',backgroundColor:'#D85A30',data:monthly.map(r=>Math.round(r[3]))},
+    {label:'고정비',type:'line',backgroundColor:'transparent',borderColor:'rgba(192,57,43,0.6)',borderWidth:1.5,borderDash:[4,3],pointRadius:0,data:MN.map(()=>mCost),order:0,fill:false},
+  ];
+  if(chartInst){ds.forEach((d,i)=>{chartInst.data.datasets[i].data=d.data;});chartInst.update('none');}
+  else{
+    chartInst=new Chart(document.getElementById('chart'),{
+      type:'bar',
+      data:{labels:MNS,datasets:ds},
+      options:{
+        responsive:true,maintainAspectRatio:false,animation:{duration:300},
+        plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>' ฿'+ctx.parsed.y.toLocaleString()}}},
+        scales:{
+          x:{stacked:true,ticks:{autoSkip:false,maxRotation:0,font:{size:10}},grid:{display:false},border:{display:false}},
+          y:{stacked:true,ticks:{callback:v=>'฿'+fK(v),font:{size:10}},grid:{color:'rgba(0,0,0,0.05)'},border:{display:false}}
+        }
+      }
+    });
+  }
+}
+
+// Listeners
+['oh','om','ol','ota'].forEach(id=>{
+  document.getElementById(id).addEventListener('input',()=>{
+    document.getElementById(id+'-o').textContent=document.getElementById(id).value+'%';
+    calc();
+  });
+});
+COST_IDS.forEach(id=>document.getElementById(id).addEventListener('input',calc));
+document.getElementById('fx').addEventListener('input',calc);
+
+// Tab switching
+const pages=document.querySelectorAll('.page');
+const tabs=document.querySelectorAll('.nav-tab');
+function switchTab(i){
+  pages.forEach((p,j)=>{p.classList.toggle('active',i===j);});
+  tabs.forEach((t,j)=>{t.classList.toggle('active',i===j);});
+}
+
+// PWA service worker
+if('serviceWorker' in navigator){
+  navigator.serviceWorker.register('sw.js').catch(()=>{});
+}
+
+calc();
+</script>
+</body>
+</html>
