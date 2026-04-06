@@ -114,6 +114,7 @@ tr.fr td{font-weight:600;background:var(--cream);border-top:1.5px solid var(--bo
     <div class="nav-tab" onclick="switchTab(2)"><span class="t1">고정비</span><span class="t2">Fixed Cost</span></div>
     <div class="nav-tab" onclick="switchTab(3)"><span class="t1">점유율</span><span class="t2">Occupancy</span></div>
     <div class="nav-tab" onclick="switchTab(4)"><span class="t1">월별내역</span><span class="t2">Monthly</span></div>
+    <div class="nav-tab" onclick="switchTab(5)"><span class="t1">내보내기</span><span class="t2">Export</span></div>
   </div>
 </nav>
 
@@ -176,10 +177,10 @@ tr.fr td{font-weight:600;background:var(--cream);border-top:1.5px solid var(--bo
 <div class="page" id="page-2">
   <div class="section">
     <div class="sec-title">월 고정비 <span class="en">Monthly Fixed Cost</span></div>
-    <div class="cr"><div class="cr-label">임차료<span class="en">Rent</span></div><div class="cr-iw"><input type="number" id="c-rent" value="55000" min="0" step="1000"><span class="cr-unit">THB</span></div></div>
-    <div class="cr"><div class="cr-label">인건비<span class="en">Staff</span></div><div class="cr-iw"><input type="number" id="c-staff" value="12500" min="0" step="1000"><span class="cr-unit">THB</span></div></div>
-    <div class="cr"><div class="cr-label">공과금·수도·전기<span class="en">Utilities</span></div><div class="cr-iw"><input type="number" id="c-util" value="7000" min="0" step="500"><span class="cr-unit">THB</span></div></div>
-    <div class="cr"><div class="cr-label">소모품·청소<span class="en">Supplies & Cleaning</span></div><div class="cr-iw"><input type="number" id="c-supply" value="6000" min="0" step="500"><span class="cr-unit">THB</span></div></div>
+    <div class="cr"><div class="cr-label">임차료<span class="en">Rent</span></div><div class="cr-iw"><input type="number" id="c-rent" value="45000" min="0" step="1000"><span class="cr-unit">THB</span></div></div>
+    <div class="cr"><div class="cr-label">인건비<span class="en">Staff</span></div><div class="cr-iw"><input type="number" id="c-staff" value="30000" min="0" step="1000"><span class="cr-unit">THB</span></div></div>
+    <div class="cr"><div class="cr-label">공과금·수도·전기<span class="en">Utilities</span></div><div class="cr-iw"><input type="number" id="c-util" value="8000" min="0" step="500"><span class="cr-unit">THB</span></div></div>
+    <div class="cr"><div class="cr-label">소모품·청소<span class="en">Supplies & Cleaning</span></div><div class="cr-iw"><input type="number" id="c-supply" value="5000" min="0" step="500"><span class="cr-unit">THB</span></div></div>
     <div class="cr"><div class="cr-label">OTA 마케팅<span class="en">OTA Marketing</span></div><div class="cr-iw"><input type="number" id="c-mkt" value="3000" min="0" step="500"><span class="cr-unit">THB</span></div></div>
     <div class="cr"><div class="cr-label">기타<span class="en">Others</span></div><div class="cr-iw"><input type="number" id="c-other" value="4000" min="0" step="500"><span class="cr-unit">THB</span></div></div>
     <div class="cost-total-row">
@@ -232,6 +233,29 @@ tr.fr td{font-weight:600;background:var(--cream);border-top:1.5px solid var(--bo
       </tr></tfoot>
     </table>
     </div>
+  </div>
+</div>
+
+<!-- PAGE 5: 내보내기 Export -->
+<div class="page" id="page-5">
+  <div class="section">
+    <div class="sec-title">시나리오 메모 <span class="en">Scenario Note</span></div>
+    <div style="font-size:11px;color:var(--text-3);margin-bottom:10px">이 시나리오의 이름이나 메모를 입력하세요 · Name this scenario for easy comparison</div>
+    <input type="text" id="export-memo" placeholder="예: 베이스 +20% 시나리오 / Base rate +20%" style="width:100%;height:40px;padding:0 12px;font-size:13px;border:1px solid var(--border-med);border-radius:var(--radius-sm);background:var(--cream);color:var(--text);outline:none;font-family:'DM Sans',sans-serif">
+  </div>
+  <div class="section">
+    <div class="sec-title">리포트 미리보기 <span class="en">Report Preview</span></div>
+    <div style="font-size:11px;color:var(--text-3);margin-bottom:12px">현재 설정 기준으로 PDF 2페이지 리포트를 생성합니다 · Generates a 2-page PDF based on current settings</div>
+    <div style="background:var(--cream);border-radius:var(--radius-sm);padding:12px 14px;margin-bottom:12px;border:1px solid var(--border)">
+      <div style="font-size:11px;font-weight:600;color:var(--text-2);margin-bottom:6px">Page 1</div>
+      <div style="font-size:11px;color:var(--text-3);line-height:1.8">시나리오명 · 생성일시<br>핵심 KPI 요약 (연간 매출 / 순수익 / 순이익률 / 월평균)<br>베이스 가격 설정 · 고정비 항목 · 점유율 & OTA 설정</div>
+    </div>
+    <div style="background:var(--cream);border-radius:var(--radius-sm);padding:12px 14px;margin-bottom:16px;border:1px solid var(--border)">
+      <div style="font-size:11px;font-weight:600;color:var(--text-2);margin-bottom:6px">Page 2</div>
+      <div style="font-size:11px;color:var(--text-3);line-height:1.8">월별 상세 내역 12개월<br>객실별 수익 / 고정비 / 월 순수익 / 원화 환산</div>
+    </div>
+    <button onclick="exportPDF()" style="width:100%;height:48px;background:var(--sage);color:#fff;border:none;border-radius:var(--radius-sm);font-size:15px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;letter-spacing:.01em">PDF 저장 · Save as PDF</button>
+    <div style="font-size:11px;color:var(--text-3);text-align:center;margin-top:8px">클릭 후 브라우저 인쇄 대화상자에서 "PDF로 저장" 선택<br>In print dialog, choose "Save as PDF"</div>
   </div>
 </div>
 
@@ -433,6 +457,162 @@ MN.forEach((_,i)=>{
     calc();saveState();
   });
 });
+
+// ── PDF 내보내기 ──
+function exportPDF(){
+  const bs=getBs(),fc=getFC();
+  const occ={h:parseInt(document.getElementById('oh').value)/100,m:parseInt(document.getElementById('om').value)/100,l:parseInt(document.getElementById('ol').value)/100};
+  const ota=parseInt(document.getElementById('ota').value)/100;
+  const fx=parseFloat(document.getElementById('fx').value);
+  const mC=getCost(),aC=mC*12;
+  const memo=document.getElementById('export-memo').value||'Cozyheim 수익 시뮬레이션';
+  const now=new Date();
+  const dateStr=`${now.getFullYear()}.${String(now.getMonth()+1).padStart(2,'0')}.${String(now.getDate()).padStart(2,'0')} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+
+  const mo=MN.map((_,mi)=>{const oc=occ[SS[mi]];return RM.map((r,i)=>Math.min(bs[i]*fc[mi],r.max)*r.beds*oc*DY[mi]);});
+  const col=[0,0,0,0];
+  const rr=mo.map(r=>{let s=0;r.forEach((v,i)=>{col[i]+=v;s+=v;});return s;});
+  const grand=rr.reduce((a,b)=>a+b,0);
+  const net=grand*(1-ota*0.2);
+  const ap=net-aC;
+  const mg=net>0?ap/net*100:0;
+  const avgOcc=(occ.h*6+occ.m*4+occ.l*3)/13;
+
+  const costLabels=['임차료 Rent','인건비 Staff','공과금 Utilities','소모품 Supplies','OTA마케팅 OTA Mktg','기타 Others'];
+  const costVals=CI.map(id=>parseFloat(document.getElementById(id).value)||0);
+
+  const pColor=ap>=0?'#2D6A4F':'#C0392B';
+  const fmtN=v=>{const a=Math.abs(v),s=v<0?'-':'';if(a>=1e6)return s+(a/1e6).toFixed(2)+'M';if(a>=1e3)return s+(a/1e3).toFixed(1)+'K';return s+Math.round(a)};
+  const fmtW=v=>{const a=Math.abs(v),s=v<0?'-':'';if(a>=1e8)return s+(a/1e8).toFixed(1)+'억';if(a>=1e4)return s+Math.round(a/1e4)+'만';return s+Math.round(a)};
+
+  const tbRows=mo.map((r,mi)=>{
+    const rev=rr[mi]*(1-ota*0.2),profit=rev-mC;
+    const sc=SS[mi];
+    const bt=sc==='h'?'High':sc==='m'?'Mid':'Low';
+    const bc=sc==='h'?'#DEF0D8':sc==='m'?'#FAEEDA':'#DAEAF8';
+    const tc=sc==='h'?'#3A6B2A':sc==='m'?'#7A4F0B':'#1A5A8A';
+    const pc=profit>=0?'#2D6A4F':'#C0392B';
+    return `<tr>
+      <td>${MN[mi]}<br><span style="font-size:9px;color:#999">${ME[mi]}</span></td>
+      <td style="text-align:center"><span style="background:${bc};color:${tc};padding:2px 5px;border-radius:3px;font-size:9px;font-weight:600">${bt}</span></td>
+      <td style="text-align:center;font-family:monospace">${fc[mi].toFixed(2)}</td>
+      ${r.map(v=>`<td>฿${fmtN(v)}<br><span style="font-size:9px;color:#999">₩${fmtW(v*fx)}</span></td>`).join('')}
+      <td style="color:#C0392B">-฿${fmtN(mC)}<br><span style="font-size:9px;color:#e07068">-₩${fmtW(mC*fx)}</span></td>
+      <td style="color:${pc};font-weight:600">${profit<0?'-':''}฿${fmtN(Math.abs(profit))}<br><span style="font-size:9px">${profit<0?'-':''}₩${fmtW(Math.abs(profit)*fx)}</span></td>
+    </tr>`;
+  }).join('');
+
+  const html=`<!DOCTYPE html><html><head><meta charset="UTF-8">
+<title>${memo} — ${dateStr}</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'DM Sans',sans-serif;font-size:11px;color:#1C1C1A;background:#fff}
+@page{size:A4;margin:14mm 14mm 12mm}
+.page1{page-break-after:always}
+.page2{}
+@media print{body{font-size:10px}}
+.header{background:#5C7E4E;color:#fff;padding:12px 16px;border-radius:6px;margin-bottom:14px;display:flex;justify-content:space-between;align-items:center}
+.header-title{font-size:16px;font-weight:600}
+.header-sub{font-size:10px;opacity:.8;margin-top:2px}
+.header-date{font-size:10px;opacity:.75;text-align:right}
+.kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:12px}
+.kpi-box{border:1px solid #e0e0dc;border-radius:6px;padding:8px 10px}
+.kpi-box.accent{background:#EEF4EB;border-color:#93B584}
+.kpi-box.profit{background:#EEF6F1;border-color:#A8D5B5}
+.kpi-box.loss{background:#FDF0EE;border-color:#F0B8B2}
+.kpi-lbl{font-size:8px;color:#9A9A94;text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px}
+.kpi-v{font-size:15px;font-weight:600;font-family:'DM Mono',monospace;line-height:1.2}
+.kpi-w{font-size:9px;color:#9A9A94;font-family:'DM Mono',monospace;margin-top:1px}
+.sec{margin-bottom:12px}
+.sec-title{font-size:8px;font-weight:600;color:#9A9A94;text-transform:uppercase;letter-spacing:.07em;margin-bottom:6px;padding-bottom:4px;border-bottom:1px solid #eee}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.three-col{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+.setting-row{display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px solid #f5f5f0;font-size:10px}
+.setting-label{color:#5A5A56}
+.setting-val{font-family:'DM Mono',monospace;font-weight:500}
+table{width:100%;border-collapse:collapse;font-size:10px}
+th{background:#5C7E4E;color:#fff;padding:5px 4px;text-align:right;font-size:8px;font-weight:600;letter-spacing:.03em;white-space:nowrap}
+th:first-child{text-align:left}
+td{padding:4px 4px;border-bottom:1px solid #f0ede8;text-align:right;vertical-align:top;line-height:1.4}
+td:first-child{text-align:left}
+tr:nth-child(even) td{background:#fafaf8}
+tfoot td{font-weight:600;background:#EEF4EB!important;border-top:1.5px solid #5C7E4E}
+</style></head><body>
+
+<div class="page1">
+  <div class="header">
+    <div><div class="header-title">${memo}</div><div class="header-sub">Cozyheim Hostel Bangkok · Revenue Simulation Report</div></div>
+    <div class="header-date">${dateStr}<br>1 THB = ${fx.toFixed(2)}원</div>
+  </div>
+
+  <div class="kpi-grid">
+    <div class="kpi-box accent"><div class="kpi-lbl">연간 총 매출 Annual Revenue</div><div class="kpi-v">฿${fmtN(grand)}</div><div class="kpi-w">₩${fmtW(grand*fx)}</div></div>
+    <div class="kpi-box"><div class="kpi-lbl">OTA 공제 후 Net Revenue</div><div class="kpi-v">฿${fmtN(net)}</div><div class="kpi-w">₩${fmtW(net*fx)}</div></div>
+    <div class="kpi-box ${ap>=0?'profit':'loss'}"><div class="kpi-lbl">연간 순수익 Net Profit</div><div class="kpi-v" style="color:${pColor}">${ap<0?'-':''}฿${fmtN(Math.abs(ap))}</div><div class="kpi-w" style="color:${pColor}">${ap<0?'-':''}₩${fmtW(Math.abs(ap)*fx)}</div></div>
+    <div class="kpi-box"><div class="kpi-lbl">월평균 순수익 Monthly Avg</div><div class="kpi-v" style="color:${pColor}">${ap<0?'-':''}฿${fmtN(Math.abs(ap/12))}</div><div class="kpi-w">순이익률 ${mg.toFixed(1)}% · 점유율 ${Math.round(avgOcc*100)}%</div></div>
+  </div>
+
+  <div class="two-col">
+    <div class="sec">
+      <div class="sec-title">베이스 가격 Base Rate</div>
+      ${RM.map((r,i)=>`<div class="setting-row"><span class="setting-label" style="display:flex;align-items:center;gap:4px"><span style="display:inline-block;width:6px;height:6px;border-radius:1px;background:${r.color}"></span>${r.name}</span><span class="setting-val">฿${bs[i]} → max ฿${r.max}</span></div>`).join('')}
+    </div>
+    <div class="sec">
+      <div class="sec-title">고정비 Fixed Cost (월/month)</div>
+      ${costLabels.map((l,i)=>`<div class="setting-row"><span class="setting-label">${l}</span><span class="setting-val">฿${fmtN(costVals[i])}</span></div>`).join('')}
+      <div class="setting-row" style="border-top:1.5px solid #ccc;margin-top:2px;padding-top:4px"><span class="setting-label" style="font-weight:600">월 합계 / 연간</span><span class="setting-val" style="font-weight:600">฿${fmtN(mC)} / ฿${fmtN(aC)}</span></div>
+    </div>
+  </div>
+
+  <div class="three-col">
+    <div class="sec">
+      <div class="sec-title">점유율 Occupancy</div>
+      <div class="setting-row"><span class="setting-label">성수기 High</span><span class="setting-val">${Math.round(occ.h*100)}%</span></div>
+      <div class="setting-row"><span class="setting-label">중간 Mid</span><span class="setting-val">${Math.round(occ.m*100)}%</span></div>
+      <div class="setting-row"><span class="setting-label">비수기 Low</span><span class="setting-val">${Math.round(occ.l*100)}%</span></div>
+    </div>
+    <div class="sec">
+      <div class="sec-title">채널 Channel Mix</div>
+      <div class="setting-row"><span class="setting-label">OTA 비중</span><span class="setting-val">${Math.round(ota*100)}%</span></div>
+      <div class="setting-row"><span class="setting-label">Direct</span><span class="setting-val">${Math.round((1-ota)*100)}%</span></div>
+      <div class="setting-row"><span class="setting-label">OTA 수수료</span><span class="setting-val">20%</span></div>
+    </div>
+    <div class="sec">
+      <div class="sec-title">월별 팩터 Monthly Factor</div>
+      ${MN.map((m,i)=>`<div class="setting-row"><span class="setting-label">${m} ${ME[i]}</span><span class="setting-val">${fc[i].toFixed(2)}×</span></div>`).join('')}
+    </div>
+  </div>
+</div>
+
+<div class="page2">
+  <div class="header">
+    <div><div class="header-title">${memo} — 월별 상세 Monthly Detail</div><div class="header-sub">Cozyheim Hostel Bangkok · Revenue Simulation Report</div></div>
+    <div class="header-date">${dateStr}</div>
+  </div>
+  <table>
+    <thead><tr>
+      <th style="text-align:left">월 Month</th><th style="text-align:center">시즌</th><th style="text-align:center">팩터×</th>
+      <th>도미 8인<br>Dorm 8</th><th>도미 6인(여)<br>Dorm 6F</th><th>싱글룸<br>Single</th><th>더블룸<br>Double</th>
+      <th>고정비<br>Fixed Cost</th><th>순수익<br>Net Profit</th>
+    </tr></thead>
+    <tbody>${tbRows}</tbody>
+    <tfoot><tr>
+      <td colspan="3" style="text-align:left">연간 합계 Annual Total</td>
+      ${col.map(v=>`<td>฿${fmtN(v)}<br><span style="font-size:9px;color:#999">₩${fmtW(v*fx)}</span></td>`).join('')}
+      <td style="color:#C0392B">-฿${fmtN(aC)}<br><span style="font-size:9px;color:#e07068">-₩${fmtW(aC*fx)}</span></td>
+      <td style="color:${pColor};font-weight:600">${ap<0?'-':''}฿${fmtN(Math.abs(ap))}<br><span style="font-size:9px">${ap<0?'-':''}₩${fmtW(Math.abs(ap)*fx)}</span></td>
+    </tr></tfoot>
+  </table>
+</div>
+
+<script>window.onload=()=>{window.print();}<\/script>
+</body></html>`;
+
+  const w=window.open('','_blank');
+  w.document.write(html);
+  w.document.close();
+}
 
 const pages=document.querySelectorAll('.page'),tabs=document.querySelectorAll('.nav-tab');
 function switchTab(i){pages.forEach((p,j)=>p.classList.toggle('active',i===j));tabs.forEach((t,j)=>t.classList.toggle('active',i===j));}
