@@ -1,4 +1,4 @@
-const CACHE = 'cozyheim-v3';
+const CACHE = 'cozyheim-v4';
 const ASSETS = [
   '/',
   '/index.html',
