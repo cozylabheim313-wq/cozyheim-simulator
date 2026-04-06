@@ -555,8 +555,13 @@ tfoot td{font-weight:600;background:#EEF4EB!important;border-top:1.5px solid #5C
 
   <div class="two-col">
     <div class="sec">
-      <div class="sec-title">베이스 가격 Base Rate</div>
-      ${RM.map((r,i)=>`<div class="setting-row"><span class="setting-label" style="display:flex;align-items:center;gap:4px"><span style="display:inline-block;width:6px;height:6px;border-radius:1px;background:${r.color}"></span>${r.name}</span><span class="setting-val">฿${bs[i]} → max ฿${r.max}</span></div>`).join('')}
+      <div class="sec-title">베이스 가격 Base Rate (비수기 / 중간 / 성수기)</div>
+      ${RM.map((r,i)=>{
+        const low=Math.round(Math.min(bs[i]*Math.min(...fc),r.max));
+        const mid=Math.round(Math.min(bs[i]*1.0,r.max));
+        const high=Math.round(Math.min(bs[i]*Math.max(...fc),r.max));
+        return `<div class="setting-row"><span class="setting-label" style="display:flex;align-items:center;gap:4px"><span style="display:inline-block;width:6px;height:6px;border-radius:1px;background:${r.color}"></span>${r.name}</span><span class="setting-val">฿${low} / ฿${mid} / ฿${high}</span></div>`;
+      }).join('')}
     </div>
     <div class="sec">
       <div class="sec-title">고정비 Fixed Cost (월/month)</div>
